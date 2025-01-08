@@ -62,13 +62,12 @@ class MainWindow(QMainWindow):
     def load_data(self):
         # Load student data from the database and populate the table
         self.table.setRowCount(0)
-        connection = sqlite3.connect("database.db")
-        result = connection.execute("SELECT * FROM students")
-        for row_num, row_data in enumerate(result):
-            self.table.insertRow(row_num)
-            for col_num, data in enumerate(row_data):
-                self.table.setItem(row_num, col_num, QTableWidgetItem(str(data)))
-        connection.close()
+        with sqlite3.connect("database.db") as connection:  # Use 'with' for automatic cleanup
+            result = connection.execute("SELECT * FROM students")
+            for row_num, row_data in enumerate(result):
+                self.table.insertRow(row_num)
+                for col_num, data in enumerate(row_data):
+                    self.table.setItem(row_num, col_num, QTableWidgetItem(str(data)))
 
     def insert(self):
         # Open the "Insert Student" dialog
@@ -259,6 +258,7 @@ class InsertDialog(QDialog):
         cursor.close()
         connection.close()
         management_system.load_data()
+        self.close()
 
 
 class SearchDialog(QDialog):
